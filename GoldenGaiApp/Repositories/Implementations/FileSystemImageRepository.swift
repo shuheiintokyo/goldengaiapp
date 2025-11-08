@@ -1,7 +1,6 @@
 import UIKit
 import Foundation
 
-@MainActor
 class FileSystemImageRepository: ImageRepository {
     static let shared = FileSystemImageRepository()
     

@@ -1,10 +1,3 @@
-//
-//  ConfigLoader.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
-
 import Foundation
 
 struct ConfigLoader {

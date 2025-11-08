@@ -15,7 +15,7 @@ struct CoreDataStack {
         
         // Configure for better performance
         let description = container.persistentStoreDescriptions.first
-        description?.shouldAddStoreAsyncually = false
+        description?.shouldAddStoreAsynchronously = false  // ✅ CORRECT
         
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
@@ -110,7 +110,7 @@ struct CoreDataStack {
     
     func validateObjectStore() -> Bool {
         do {
-            let request: NSFetchRequest<Bar> = Bar.fetchRequest()
+            let request: NSFetchRequest<Bar> = Bar.fetchRequest() as! NSFetchRequest<Bar>
             request.returnsObjectsAsFaults = true
             let count = try viewContext.count(for: request)
             print("✅ Object store validated: \(count) bars")

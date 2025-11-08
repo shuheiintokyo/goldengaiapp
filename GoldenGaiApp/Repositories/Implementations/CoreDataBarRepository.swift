@@ -1,7 +1,6 @@
 import Foundation
 import CoreData
 
-@MainActor
 class CoreDataBarRepository: BarRepository {
     static let shared = CoreDataBarRepository()
     

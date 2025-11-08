@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 class BarInfoService: ObservableObject {
     @Published var barInfoCache: [String: BarInfo] = [:]
     @Published var isLoading = false

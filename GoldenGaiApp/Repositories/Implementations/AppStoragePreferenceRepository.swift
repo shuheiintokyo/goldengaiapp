@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 class AppStoragePreferencesRepository: PreferencesRepository {
     static let shared = AppStoragePreferencesRepository()
     

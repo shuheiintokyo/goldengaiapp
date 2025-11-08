@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 class AppwriteCloudRepository: CloudRepository {
     static let shared = AppwriteCloudRepository()
     

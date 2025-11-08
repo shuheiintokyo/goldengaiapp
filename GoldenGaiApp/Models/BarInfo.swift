@@ -11,7 +11,7 @@ struct BarInfo: Codable, Identifiable {
     let capacity: Int?
     let owner: String?
     let features: [String]
-    let comments: [BarComment]
+    var comments: [BarComment]
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -26,6 +26,37 @@ struct BarInfo: Codable, Identifiable {
         case features
         case comments
     }
+    
+    // MARK: - Preview for SwiftUI
+    
+    #if DEBUG
+    static var preview: BarInfo {
+        BarInfo(
+            id: "bar-001",
+            detailedDescription: "A cozy and intimate bar in the heart of Golden Gai",
+            history: "Established in 1985, this historic bar has been a favorite among locals",
+            specialties: ["Japanese Whisky", "Sake"],
+            priceRange: "¥1,000 - ¥3,000",
+            openingHours: "6:00 PM - 12:00 AM",
+            closingDay: "Monday",
+            capacity: 5,
+            owner: "Yamada-san",
+            features: ["Intimate", "Historic", "Friendly Owner"],
+            comments: [
+                BarComment(
+                    id: "c1",
+                    barUUID: "bar-001",
+                    author: "Traveler",
+                    content: "Great atmosphere!",
+                    language: .english,
+                    rating: 5.0,
+                    createdAt: Date(),
+                    updatedAt: nil
+                )
+            ]
+        )
+    }
+    #endif
 }
 
 struct BarComment: Codable, Identifiable {

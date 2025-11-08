@@ -33,17 +33,29 @@
 		05CA1C592EBEE6E60041BEC3 /* Exceptions for "GoldenGaiApp" folder in "GoldenGaiApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Views/Resources/barinfo.json,
 				Views/Settings/AppGuideView.swift,
 			);
 			target = 05CA1B562EBEE29F0041BEC3 /* GoldenGaiApp */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		05CA1F822EBF6E9D0041BEC3 /* Exceptions for "GoldenGaiApp" folder in "Copy Bundle Resources" phase from "GoldenGaiApp" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 05CA1B552EBEE29F0041BEC3 /* Resources */;
+			membershipExceptions = (
+				Views/Resources/barinfo.json,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		05CA1B592EBEE29F0041BEC3 /* GoldenGaiApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				05CA1C592EBEE6E60041BEC3 /* Exceptions for "GoldenGaiApp" folder in "GoldenGaiApp" target */,
+				05CA1F822EBF6E9D0041BEC3 /* Exceptions for "GoldenGaiApp" folder in "Copy Bundle Resources" phase from "GoldenGaiApp" target */,
 			);
 			path = GoldenGaiApp;
 			sourceTree = "<group>";
