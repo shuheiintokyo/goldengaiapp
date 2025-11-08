@@ -1,7 +1,21 @@
-//
-//  LoadingView.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
+import SwiftUI
 
+struct LoadingView: View {
+    let message: String?
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+            
+            if let message = message {
+                Text(message)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+    }
+}
+
+#Preview {
+    LoadingView(message: "Loading...")
+}

@@ -1,7 +1,16 @@
-//
-//  DynamicBackgroundImage.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
+import SwiftUI
 
+struct DynamicBackgroundImage: View {
+    let imageName: String
+    
+    var body: some View {
+        Image(imageName)
+            .resizable()
+            .scaledToFill()
+            .ignoresSafeArea()
+    }
+}
+
+#Preview {
+    DynamicBackgroundImage(imageName: "ContentBackground")
+}

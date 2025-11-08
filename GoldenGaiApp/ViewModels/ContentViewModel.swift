@@ -1,7 +1,29 @@
-//
-//  ContentViewModel.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
+import Foundation
 
+@MainActor
+class ContentViewModel: ObservableObject {
+    @Published var selectedTab = 0
+    @Published var showWelcome = true
+    
+    private let preferencesRepository: PreferencesRepository
+    
+    init(preferencesRepository: PreferencesRepository = AppStoragePreferencesRepository.shared) {
+        self.preferencesRepository = preferencesRepository
+        checkFirstLaunch()
+    }
+    
+    func checkFirstLaunch() {
+        // Show welcome only on first launch
+        if preferencesRepository.isLoggedIn {
+            showWelcome = false
+        }
+    }
+    
+    func switchTab(_ tab: Int) {
+        selectedTab = tab
+    }
+    
+    func dismissWelcome() {
+        showWelcome = false
+    }
+}

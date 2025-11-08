@@ -1,7 +1,7 @@
-//
-//  UIView+Extensions.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
+import UIKit
 
+extension UIView {
+    func addSubviews(_ views: UIView...) {
+        views.forEach { addSubview($0) }
+    }
+}

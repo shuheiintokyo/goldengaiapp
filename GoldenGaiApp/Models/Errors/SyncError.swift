@@ -1,7 +1,23 @@
-//
-//  SyncError.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
 
+enum SyncError: LocalizedError {
+    case authenticationFailed
+    case timeoutError
+    case partialSync(successful: Int, failed: Int)
+    case noInternetConnection
+    case invalidResponse
+    
+    var errorDescription: String? {
+        switch self {
+        case .authenticationFailed:
+            return "Authentication failed"
+        case .timeoutError:
+            return "Operation timed out"
+        case .partialSync(let s, let f):
+            return "Partial sync: \(s) successful, \(f) failed"
+        case .noInternetConnection:
+            return "No internet connection"
+        case .invalidResponse:
+            return "Invalid server response"
+        }
+    }
+}
