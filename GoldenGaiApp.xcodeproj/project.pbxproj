@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		05CA1F8F2EBF759C0041BEC3 /* Bar+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CA1F8B2EBF759C0041BEC3 /* Bar+CoreDataClass.swift */; };
+		05CA1F902EBF759C0041BEC3 /* Item+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CA1F8D2EBF759C0041BEC3 /* Item+CoreDataClass.swift */; };
+		05CA1F912EBF759C0041BEC3 /* Item+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CA1F8E2EBF759C0041BEC3 /* Item+CoreDataProperties.swift */; };
+		05CA1F922EBF759C0041BEC3 /* Bar+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CA1F8C2EBF759C0041BEC3 /* Bar+CoreDataProperties.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		05CA1B6A2EBEE2A20041BEC3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +34,10 @@
 		05CA1B572EBEE29F0041BEC3 /* GoldenGaiApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoldenGaiApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		05CA1B692EBEE2A20041BEC3 /* GoldenGaiAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoldenGaiAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		05CA1B732EBEE2A20041BEC3 /* GoldenGaiAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoldenGaiAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		05CA1F8B2EBF759C0041BEC3 /* Bar+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bar+CoreDataClass.swift"; sourceTree = "<group>"; };
+		05CA1F8C2EBF759C0041BEC3 /* Bar+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bar+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		05CA1F8D2EBF759C0041BEC3 /* Item+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Item+CoreDataClass.swift"; sourceTree = "<group>"; };
+		05CA1F8E2EBF759C0041BEC3 /* Item+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Item+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -100,6 +111,10 @@
 		05CA1B4E2EBEE29F0041BEC3 = {
 			isa = PBXGroup;
 			children = (
+				05CA1F8B2EBF759C0041BEC3 /* Bar+CoreDataClass.swift */,
+				05CA1F8C2EBF759C0041BEC3 /* Bar+CoreDataProperties.swift */,
+				05CA1F8D2EBF759C0041BEC3 /* Item+CoreDataClass.swift */,
+				05CA1F8E2EBF759C0041BEC3 /* Item+CoreDataProperties.swift */,
 				05CA1B592EBEE29F0041BEC3 /* GoldenGaiApp */,
 				05CA1B6C2EBEE2A20041BEC3 /* GoldenGaiAppTests */,
 				05CA1B762EBEE2A20041BEC3 /* GoldenGaiAppUITests */,
@@ -261,6 +276,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05CA1F8F2EBF759C0041BEC3 /* Bar+CoreDataClass.swift in Sources */,
+				05CA1F902EBF759C0041BEC3 /* Item+CoreDataClass.swift in Sources */,
+				05CA1F912EBF759C0041BEC3 /* Item+CoreDataProperties.swift in Sources */,
+				05CA1F922EBF759C0041BEC3 /* Bar+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

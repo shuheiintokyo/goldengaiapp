@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 protocol CloudRepository {
     func syncBars() async throws -> Int
     func uploadImage(_ imageData: Data, for uuid: String) async throws -> String

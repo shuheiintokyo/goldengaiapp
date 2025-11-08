@@ -3,6 +3,7 @@ import Foundation
 enum BarError: LocalizedError {
     case notFound(uuid: String)
     case failedToUpdate(reason: String)
+    case failedToFetch(reason: String)
     case syncFailed(String)
     case imageUploadFailed(String)
     case invalidData(String)
@@ -15,6 +16,8 @@ enum BarError: LocalizedError {
             return "Bar not found: \(uuid)"
         case .failedToUpdate(let reason):
             return "Failed to update bar: \(reason)"
+        case .failedToFetch(let reason):
+            return "Failed to fetch bar: \(reason)"
         case .syncFailed(let reason):
             return "Sync failed: \(reason)"
         case .imageUploadFailed(let reason):

@@ -10,6 +10,7 @@ struct BarInfo: Codable, Identifiable {
     let closingDay: String?
     let capacity: Int?
     let owner: String?
+    let yearEstablished: Int?
     let features: [String]
     var comments: [BarComment]
     
@@ -23,8 +24,37 @@ struct BarInfo: Codable, Identifiable {
         case closingDay
         case capacity
         case owner
+        case yearEstablished = "year_established"
         case features
         case comments
+    }
+    
+    init(
+        id: String,
+        detailedDescription: String,
+        history: String? = nil,
+        specialties: [String] = [],
+        priceRange: String? = nil,
+        openingHours: String? = nil,
+        closingDay: String? = nil,
+        capacity: Int? = nil,
+        owner: String? = nil,
+        yearEstablished: Int? = nil,
+        features: [String] = [],
+        comments: [BarComment] = []
+    ) {
+        self.id = id
+        self.detailedDescription = detailedDescription
+        self.history = history
+        self.specialties = specialties
+        self.priceRange = priceRange
+        self.openingHours = openingHours
+        self.closingDay = closingDay
+        self.capacity = capacity
+        self.owner = owner
+        self.yearEstablished = yearEstablished
+        self.features = features
+        self.comments = comments
     }
     
     // MARK: - Preview for SwiftUI
@@ -41,6 +71,7 @@ struct BarInfo: Codable, Identifiable {
             closingDay: "Monday",
             capacity: 5,
             owner: "Yamada-san",
+            yearEstablished: 1985,
             features: ["Intimate", "Historic", "Friendly Owner"],
             comments: [
                 BarComment(

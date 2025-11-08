@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 protocol BarRepository {
     func fetch() -> [Bar]
     func fetchByUUID(_ uuid: String) -> Bar?
