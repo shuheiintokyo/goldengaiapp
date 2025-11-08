@@ -1,10 +1,3 @@
-//
-//  DataSeeder.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
-
 import Foundation
 import CoreData
 
@@ -31,8 +24,6 @@ struct DataSeeder {
             bar.uuid = barData.id
             bar.name = barData.name
             bar.nameJapanese = barData.nameJapanese
-            bar.latitude = barData.latitude
-            bar.longitude = barData.longitude
             bar.visited = false
             bar.photoURLs = []
             bar.tags = barData.tags
@@ -93,8 +84,6 @@ struct DataSeeder {
         }
         
         var bars: [BarData] = []
-        let goldenGaiLat = 35.6656
-        let goldenGaiLon = 139.7360
         
         // Iterate through map grid
         for (rowIndex, row) in mapArray.enumerated() {
@@ -103,12 +92,6 @@ struct DataSeeder {
                 
                 // Generate unique ID
                 let barID = UUID().uuidString
-                
-                // Calculate approximate coordinates within Golden Gai
-                let latOffset = Double(rowIndex) * 0.0002
-                let lonOffset = Double(colIndex) * 0.0001
-                let latitude = goldenGaiLat + latOffset
-                let longitude = goldenGaiLon + lonOffset
                 
                 // Get Japanese name from barinfo if available
                 var barNameJapanese = barName
@@ -123,8 +106,6 @@ struct DataSeeder {
                     id: barID,
                     name: barName,
                     nameJapanese: barNameJapanese,
-                    latitude: latitude,
-                    longitude: longitude,
                     tags: extractTags(from: barName)
                 )
                 
@@ -167,7 +148,5 @@ struct BarData {
     let id: String
     let name: String
     let nameJapanese: String
-    let latitude: Double
-    let longitude: Double
     let tags: [String]
 }

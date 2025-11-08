@@ -28,15 +28,13 @@ struct BarCardView: View {
                 }
                 
                 HStack(spacing: 16) {
-                    Label("📍 \(String(format: "%.3f", bar.latitude))", systemImage: "mappin")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
                     if bar.hasPhotos {
                         Label("\(bar.photoCount)", systemImage: "photo")
                             .font(.caption)
                             .foregroundColor(.blue)
                     }
+                    
+                    Spacer()
                 }
             }
             .padding()
@@ -55,8 +53,6 @@ struct BarCardView: View {
     let bar = Bar(context: context)
     bar.name = "Test Bar"
     bar.nameJapanese = "テストバー"
-    bar.latitude = 35.6656
-    bar.longitude = 139.7360
     bar.visited = true
     bar.photoURLs = ["photo1.jpg", "photo2.jpg"]
     

@@ -26,18 +26,14 @@ struct BarDetailHeader: View {
                 }
             }
             
-            HStack(spacing: 12) {
-                Label("📍 \(String(format: "%.4f", bar.latitude))", systemImage: "location.fill")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                Spacer()
-                
-                if bar.visited, let date = bar.visitedDate {
-                    Label("Visited", systemImage: "checkmark")
+            if bar.visited, let date = bar.visitedDate {
+                HStack {
+                    Image(systemName: "checkmark")
                         .font(.caption)
-                        .foregroundColor(.green)
+                    Text(date.formatted(date: .abbreviated, time: .omitted))
+                        .font(.caption)
                 }
+                .foregroundColor(.green)
             }
         }
         .padding()
@@ -51,8 +47,6 @@ struct BarDetailHeader: View {
     let bar = Bar(context: context)
     bar.name = "Test Bar"
     bar.nameJapanese = "テストバー"
-    bar.latitude = 35.6656
-    bar.longitude = 139.7360
     bar.visited = true
     bar.visitedDate = Date()
     

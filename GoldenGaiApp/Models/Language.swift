@@ -63,56 +63,12 @@ enum TagCategory: String, Codable, CaseIterable {
     }
 }
 
-// MARK: - Location Model
-
-struct Location: Codable, Equatable {
-    let latitude: Double
-    let longitude: Double
-    
-    var coordinate: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
-    
-    init(latitude: Double, longitude: Double) {
-        self.latitude = latitude
-        self.longitude = longitude
-    }
-    
-    func distance(to other: Location) -> Double {
-        // Haversine formula for calculating distance between two points
-        let earthRadiusKm = 6371.0
-        
-        let dLat = (other.latitude - latitude).degreesToRadians
-        let dLon = (other.longitude - longitude).degreesToRadians
-        
-        let a = sin(dLat / 2) * sin(dLat / 2) +
-                cos(latitude.degreesToRadians) * cos(other.latitude.degreesToRadians) *
-                sin(dLon / 2) * sin(dLon / 2)
-        
-        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        return earthRadiusKm * c
-    }
-}
-
-// MARK: - Double Extension for Radians
-
-extension Double {
-    var degreesToRadians: Double {
-        self * .pi / 180.0
-    }
-    
-    var radiansToDegrees: Double {
-        self * 180.0 / .pi
-    }
-}
-
 // MARK: - Sort Options
 
 enum SortOption: String, CaseIterable {
     case nameAscending = "Name (A-Z)"
     case nameDescending = "Name (Z-A)"
     case recentlyVisited = "Recently Visited"
-    case distance = "Distance"
     case rating = "Rating"
     
     var sortDescriptors: [NSSortDescriptor] {
@@ -123,10 +79,8 @@ enum SortOption: String, CaseIterable {
             return [NSSortDescriptor(keyPath: \Bar.name, ascending: false)]
         case .recentlyVisited:
             return [NSSortDescriptor(keyPath: \Bar.visitedDate, ascending: false)]
-        case .distance:
-            return [NSSortDescriptor(keyPath: \Bar.latitude, ascending: true)]
         case .rating:
-            return [] // Would need rating field
+            return []
         }
     }
 }
@@ -138,14 +92,12 @@ struct FilterOptions {
     var selectedTags: Set<String> = []
     var showVisitedOnly: Bool = false
     var priceRange: ClosedRange<Double>? = nil
-    var distanceRange: ClosedRange<Double>? = nil
     
     var isEmpty: Bool {
         searchText.isEmpty &&
         selectedTags.isEmpty &&
         !showVisitedOnly &&
-        priceRange == nil &&
-        distanceRange == nil
+        priceRange == nil
     }
     
     mutating func reset() {
@@ -153,7 +105,6 @@ struct FilterOptions {
         selectedTags.removeAll()
         showVisitedOnly = false
         priceRange = nil
-        distanceRange = nil
     }
 }
 
@@ -197,7 +148,3 @@ struct AppVersion: Codable, Equatable {
         )
     }
 }
-
-// MARK: - Imports needed
-
-import CoreLocation

@@ -1,5 +1,6 @@
 import Foundation
 import CoreData
+import UIKit
 
 class MockBarRepository: BarRepository {
     var mockBars: [Bar] = []
@@ -131,8 +132,6 @@ extension Bar {
             bar.uuid = "bar-\(index)"
             bar.name = name
             bar.nameJapanese = jaName
-            bar.latitude = 35.6656 + Double(index) * 0.0005
-            bar.longitude = 139.7360 + Double(index) * 0.0005
             bar.visited = index % 2 == 0
             bar.tags = ["intimate", "historic"]
             bar.photoURLs = []
