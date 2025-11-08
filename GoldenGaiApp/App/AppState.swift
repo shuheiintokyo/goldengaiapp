@@ -9,12 +9,10 @@ class AppState: ObservableObject {
     @Published var highlightedBarUUID: String?
     @Published var lastSyncDate: Date?
     
-    // UI Customization
     @Published var contentViewBackground = "ContentBackground"
     @Published var barListViewBackground = "BarListBackground"
     @Published var mapViewBackground = "BarMapBackground"
     
-    // Loading states
     @Published var isSyncing = false
     @Published var syncError: String?
     
@@ -36,5 +34,12 @@ class AppState: ObservableObject {
         UserDefaults.standard.set(contentViewBackground, forKey: "ContentViewBackground")
         UserDefaults.standard.set(barListViewBackground, forKey: "BarListViewBackground")
         UserDefaults.standard.set(mapViewBackground, forKey: "MapViewBackground")
+    }
+    
+    func logout() {
+        isLoggedIn = false
+        selectedTab = 0
+        persistState()
+        print("✅ User logged out from AppState")
     }
 }
