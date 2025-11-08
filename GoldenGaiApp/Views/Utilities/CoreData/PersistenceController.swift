@@ -1,10 +1,3 @@
-//
-//  Persistence.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
-
 import CoreData
 
 struct PersistenceController {
