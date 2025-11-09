@@ -9,11 +9,11 @@ struct BarCardView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(bar.displayName)
+                        Text(bar.name ?? "Unknown Bar")
                             .font(.headline)
                             .foregroundColor(.primary)
                         
-                        Text(bar.displayNameJapanese)
+                        Text(bar.nameJapanese ?? "")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -28,8 +28,9 @@ struct BarCardView: View {
                 }
                 
                 HStack(spacing: 16) {
-                    if bar.hasPhotos {
-                        Label("\(bar.photoCount)", systemImage: "photo")
+                    let photoURLs = bar.photoURLs as? [String] ?? []
+                    if !photoURLs.isEmpty {
+                        Label("\(photoURLs.count)", systemImage: "photo")
                             .font(.caption)
                             .foregroundColor(.blue)
                     }
@@ -47,4 +48,3 @@ struct BarCardView: View {
         }
     }
 }
-

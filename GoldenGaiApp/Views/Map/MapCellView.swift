@@ -19,13 +19,13 @@ struct MapCellView: View {
                 }
                 .frame(width: 40, height: 40)
                 
-                Text(bar.displayName)
+                Text(bar.name ?? "Unknown")
                     .font(.caption2)
                     .fontWeight(.semibold)
                     .lineLimit(1)
                 
                 if isSelected {
-                    Text(bar.displayNameJapanese)
+                    Text(bar.nameJapanese ?? "")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .lineLimit(1)

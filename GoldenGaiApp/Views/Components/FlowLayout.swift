@@ -13,7 +13,7 @@ struct FlowLayout<Content: View>: View {
             GridItem(.adaptive(minimum: 80), spacing: spacing)
         ]
         
-        SwiftUI.LazyGrid(columns: columns, alignment: .leading, spacing: spacing) {
+        LazyVGrid(columns: columns, alignment: .leading, spacing: spacing) {
             ForEach(items, id: \.self){item in
                 content(item)
             }

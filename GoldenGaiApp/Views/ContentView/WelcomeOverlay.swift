@@ -48,7 +48,7 @@ struct WelcomeOverlay: View {
                         .cornerRadius(10)
                 }
                 
-                Button(role: .secondary) {
+                Button(role: .cancel) {
                     isPresented = false
                 } label: {
                     Text("Skip")
