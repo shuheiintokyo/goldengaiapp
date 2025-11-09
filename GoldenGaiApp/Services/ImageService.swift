@@ -1,3 +1,6 @@
+import SwiftUI
+import Foundation
+import Combine
 import UIKit
 
 @MainActor
@@ -8,6 +11,7 @@ class ImageService: ObservableObject {
     private let imageRepository: ImageRepository
     private let cloudRepository: CloudRepository
     
+    @MainActor
     init(
         imageRepository: ImageRepository = FileSystemImageRepository.shared,
         cloudRepository: CloudRepository = AppwriteCloudRepository.shared

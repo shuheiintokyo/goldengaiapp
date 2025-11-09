@@ -1,5 +1,7 @@
+import UIKit
 import Foundation
 import CoreData
+import Combine
 
 struct DataSeeder {
     
@@ -26,7 +28,7 @@ struct DataSeeder {
             bar.nameJapanese = barData.nameJapanese
             bar.visited = false
             bar.photoURLs = []
-            bar.tags = barData.tags
+            bar.tags = barData.tags as NSArray
             bar.lastSyncedDate = Date()
         }
         

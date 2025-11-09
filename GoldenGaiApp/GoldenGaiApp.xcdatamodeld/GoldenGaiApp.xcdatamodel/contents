@@ -4,8 +4,8 @@
         <attribute name="lastSyncedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="nameJapanese" optional="YES" attributeType="String"/>
-        <attribute name="photoURLs" optional="YES" attributeType="Transformable" customClassName="Array"/>
-        <attribute name="tags" optional="YES" attributeType="Transformable" customClassName="Array"/>
+        <attribute name="photoURLs" optional="YES" attributeType="Transformable" customClassName="NSArray"/>
+        <attribute name="tags" optional="YES" attributeType="Transformable" customClassName="NSArray"/>
         <attribute name="uuid" optional="YES" attributeType="String"/>
         <attribute name="visited" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="visitedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>

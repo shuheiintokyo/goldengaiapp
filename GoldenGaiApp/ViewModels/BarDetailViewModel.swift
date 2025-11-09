@@ -1,4 +1,7 @@
 import Foundation
+import UIKit
+import Combine
+import SwiftUI
 
 @MainActor
 class BarDetailViewModel: ObservableObject {
@@ -13,18 +16,19 @@ class BarDetailViewModel: ObservableObject {
     private let imageService: ImageService
     private let syncService: SyncService
     
+    @MainActor
     init(
         bar: Bar? = nil,
-        barRepository: BarRepository = CoreDataBarRepository.shared,
-        barInfoService: BarInfoService = BarInfoService(),
-        imageService: ImageService = ImageService(),
-        syncService: SyncService = SyncService()
+        barRepository: BarRepository? = nil,
+        barInfoService: BarInfoService? = nil,
+        imageService: ImageService? = nil,
+        syncService: SyncService? = nil
     ) {
         self.bar = bar
-        self.barRepository = barRepository
-        self.barInfoService = barInfoService
-        self.imageService = imageService
-        self.syncService = syncService
+        self.barRepository = barRepository ?? CoreDataBarRepository.shared
+        self.barInfoService = barInfoService ?? BarInfoService()
+        self.imageService = imageService ?? ImageService()
+        self.syncService = syncService ?? SyncService()
     }
     
     func loadBarDetails(uuid: String) {
@@ -61,14 +65,21 @@ class BarDetailViewModel: ObservableObject {
         
         let imageURL = try await imageService.uploadImage(image, for: uuid)
         try barRepository.addPhoto(uuid, photoURL: imageURL)
-        self.bar?.photoURLs.append(imageURL)
-    }
-    
-    func addComment(_ content: String, language: Language) throws {
-        guard let bar = bar, let uuid = bar.uuid else {
-            throw BarError.invalidData("No bar selected")
+        if let currentURLs = self.bar?.photoURLs as? [String] {
+            var updatedURLs = currentURLs
+            updatedURLs.append(imageURL)
+            self.bar?.photoURLs = updatedURLs as NSArray
+        } else {
+            self.bar?.photoURLs = [imageURL] as NSArray
         }
-        
-        try barRepository.addComment(uuid, comment: content, language: language.code)
     }
-}
+        
+        func addComment(_ content: String, language: Language) throws {
+            guard let uuid = bar?.uuid else {
+                throw BarError.invalidData("No bar selected")
+            }
+            
+            try barRepository.addComment(uuid, comment: content, language: language.code)
+        }
+    }
+

@@ -1,5 +1,7 @@
 import Foundation
-import UserNotifications
+import CoreData
+import Combine
+import SwiftUI
 
 @MainActor
 class NotificationService: ObservableObject {

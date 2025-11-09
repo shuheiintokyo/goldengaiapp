@@ -1,4 +1,6 @@
 import Foundation
+import CoreData
+import Combine
 import SwiftUI
 
 @MainActor
@@ -30,13 +32,17 @@ class BarListViewModel: ObservableObject {
     
     private let barRepository: BarRepository
     private let barInfoService: BarInfoService
+    private let imageService: ImageService
     
+    @MainActor
     init(
-        barRepository: BarRepository = CoreDataBarRepository.shared,
-        barInfoService: BarInfoService = BarInfoService()
+        barRepository: BarRepository? = nil,
+        barInfoService: BarInfoService? = nil,
+        imageService: ImageService? = nil
     ) {
-        self.barRepository = barRepository
-        self.barInfoService = barInfoService
+        self.barRepository = barRepository ?? CoreDataBarRepository.shared
+        self.barInfoService = barInfoService ?? BarInfoService()
+        self.imageService = imageService ?? ImageService()
     }
     
     // MARK: - Loading
@@ -65,16 +71,19 @@ class BarListViewModel: ObservableObject {
         // Search filter
         if !searchText.isEmpty {
             filtered = filtered.filter { bar in
-                bar.displayName.localizedCaseInsensitiveContains(searchText) ||
-                bar.displayNameJapanese.localizedCaseInsensitiveContains(searchText)
+                bar.name?.localizedCaseInsensitiveContains(searchText) ?? false ||
+                bar.nameJapanese?.localizedCaseInsensitiveContains(searchText) ?? false
             }
         }
         
         // Tag filter
         if !selectedTags.isEmpty {
             filtered = filtered.filter { bar in
-                let barTags = Set(bar.tags)
-                return !selectedTags.intersection(barTags).isEmpty
+                if let tags = bar.tags as? [String]{
+                    let barTags = Set(tags)
+                    return !selectedTags.intersection(barTags).isEmpty
+                }
+                return false
             }
         }
         
@@ -142,62 +151,3 @@ class BarListViewModel: ObservableObject {
         return Double(visitedCount) / Double(totalCount) * 100
     }
 }
-
-// MARK: - Preview Support
-
-#if DEBUG
-extension BarListViewModel {
-    static var preview: BarListViewModel {
-        let vm = BarListViewModel()
-        vm.bars = [
-            mockBar1,
-            mockBar2,
-            mockBar3
-        ]
-        vm.filteredBars = vm.bars
-        return vm
-    }
-}
-
-// Mock Bars for preview
-let mockBar1: Bar = {
-    let bar = Bar(context: PersistenceController.preview.container.viewContext)
-    bar.uuid = "bar-001"
-    bar.name = "The Bar"
-    bar.nameJapanese = "ザ・バー"
-    bar.latitude = 35.6656
-    bar.longitude = 139.7360
-    bar.visited = true
-    bar.visitedDate = Date()
-    bar.tags = ["intimate", "historic"]
-    bar.photoURLs = ["photo1.jpg"]
-    return bar
-}()
-
-let mockBar2: Bar = {
-    let bar = Bar(context: PersistenceController.preview.container.viewContext)
-    bar.uuid = "bar-002"
-    bar.name = "Another Bar"
-    bar.nameJapanese = "別のバー"
-    bar.latitude = 35.6660
-    bar.longitude = 139.7365
-    bar.visited = false
-    bar.tags = ["cozy"]
-    bar.photoURLs = []
-    return bar
-}()
-
-let mockBar3: Bar = {
-    let bar = Bar(context: PersistenceController.preview.container.viewContext)
-    bar.uuid = "bar-003"
-    bar.name = "Special Spot"
-    bar.nameJapanese = "特別な場所"
-    bar.latitude = 35.6665
-    bar.longitude = 139.7370
-    bar.visited = true
-    bar.visitedDate = Date(timeIntervalSinceNow: -86400)
-    bar.tags = ["whisky", "friendly"]
-    bar.photoURLs = ["photo2.jpg", "photo3.jpg"]
-    return bar
-}()
-#endif

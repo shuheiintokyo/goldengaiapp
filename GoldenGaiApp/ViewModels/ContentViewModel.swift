@@ -1,4 +1,7 @@
 import Foundation
+import CoreData
+import Combine
+import SwiftUI
 
 @MainActor
 class ContentViewModel: ObservableObject {

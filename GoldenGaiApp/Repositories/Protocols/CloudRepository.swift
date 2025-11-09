@@ -1,4 +1,7 @@
+import UIKit
 import Foundation
+import CoreData
+import Combine
 
 protocol CloudRepository {
     func syncBars() async throws -> Int

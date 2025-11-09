@@ -1,5 +1,9 @@
+import UIKit
 import Foundation
+import CoreData
+import Combine
 
+@MainActor
 class BarInfoService: ObservableObject {
     @Published var barInfoCache: [String: BarInfo] = [:]
     @Published var isLoading = false

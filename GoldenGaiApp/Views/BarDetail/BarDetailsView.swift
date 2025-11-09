@@ -15,9 +15,9 @@ struct BarDetailView: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(bar.displayName)
+                        Text(bar.name ?? "Unknown")
                             .font(.title)
-                        Text(bar.displayNameJapanese)
+                        Text(bar.nameJapanese ?? "")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
@@ -60,14 +60,3 @@ struct BarDetailView: View {
     }
 }
 
-#Preview {
-    let context = PersistenceController.preview.container.viewContext
-    let bar = Bar(context: context)
-    bar.name = "Test Bar"
-    bar.nameJapanese = "テストバー"
-    
-    return NavigationView {
-        BarDetailView(bar: bar)
-            .environmentObject(AppState())
-    }
-}

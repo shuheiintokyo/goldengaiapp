@@ -1,3 +1,6 @@
+import SwiftUI
+import UIKit
+import Combine
 import Foundation
 
 @MainActor
@@ -11,15 +14,16 @@ class SettingsViewModel: ObservableObject {
     @Published var isSyncing = false
     @Published var syncError: String?
     
-    private let preferencesRepository: PreferencesRepository
+    private var preferencesRepository: PreferencesRepository
     private let syncService: SyncService
     
+    @MainActor
     init(
         preferencesRepository: PreferencesRepository = AppStoragePreferencesRepository.shared,
-        syncService: SyncService = SyncService()
+        syncService: SyncService? = nil
     ) {
         self.preferencesRepository = preferencesRepository
-        self.syncService = syncService
+        self.syncService = syncService ?? SyncService()
         loadSettings()
     }
     

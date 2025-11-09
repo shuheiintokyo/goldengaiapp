@@ -48,14 +48,3 @@ struct BarCardView: View {
     }
 }
 
-#Preview {
-    let context = PersistenceController.preview.container.viewContext
-    let bar = Bar(context: context)
-    bar.name = "Test Bar"
-    bar.nameJapanese = "テストバー"
-    bar.visited = true
-    bar.photoURLs = ["photo1.jpg", "photo2.jpg"]
-    
-    return BarCardView(bar: bar)
-        .padding()
-}

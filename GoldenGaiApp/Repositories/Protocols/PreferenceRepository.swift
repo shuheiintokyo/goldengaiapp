@@ -1,5 +1,7 @@
+import UIKit
 import Foundation
-
+import CoreData
+import Combine
 @MainActor
 protocol PreferencesRepository {
     var isLoggedIn: Bool { get set }
@@ -8,5 +10,8 @@ protocol PreferencesRepository {
     var backgroundPreference: String { get set }
     
     func save()
+    
+    func setLoginData(email: String, userId: String, token: String)
     func load()
+    func logout()
 }

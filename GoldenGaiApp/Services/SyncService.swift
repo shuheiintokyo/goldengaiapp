@@ -1,4 +1,7 @@
 import Foundation
+import CoreData
+import Combine
+import SwiftUI
 
 @MainActor
 class SyncService: ObservableObject {
@@ -12,15 +15,16 @@ class SyncService: ObservableObject {
     private let barInfoService: BarInfoService
     private let preferencesRepository: PreferencesRepository
     
+    @MainActor
     init(
-        barRepository: BarRepository = CoreDataBarRepository.shared,
-        cloudRepository: CloudRepository = AppwriteCloudRepository.shared,
+        barRepository: BarRepository? = nil,
+        cloudRepository: CloudRepository? = nil,
         barInfoService: BarInfoService? = nil,
         preferencesRepository: PreferencesRepository = AppStoragePreferencesRepository.shared
     ) {
-        self.barRepository = barRepository
-        self.cloudRepository = cloudRepository
-        self.barInfoService = barInfoService ?? BarInfoService(repository: barRepository)
+        self.barRepository = barRepository ?? CoreDataBarRepository.shared
+        self.cloudRepository = cloudRepository ?? AppwriteCloudRepository.shared
+        self.barInfoService = barInfoService ?? BarInfoService()
         self.preferencesRepository = preferencesRepository
     }
     

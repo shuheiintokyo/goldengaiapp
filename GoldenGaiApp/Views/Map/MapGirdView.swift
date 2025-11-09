@@ -46,22 +46,3 @@ struct MapGridView: View {
         .cornerRadius(12)
     }
 }
-
-#Preview {
-    @State var selectedUUID: String? = nil
-    
-    let context = PersistenceController.preview.container.viewContext
-    var bars: [Bar] = []
-    
-    for i in 1...4 {
-        let bar = Bar(context: context)
-        bar.name = "Bar \(i)"
-        bar.nameJapanese = "バー\(i)"
-        bar.uuid = "bar-\(i)"
-        bar.visited = i % 2 == 0
-        bars.append(bar)
-    }
-    
-    return MapGridView(bars: bars, selectedBarUUID: $selectedUUID)
-        .padding()
-}

@@ -7,9 +7,9 @@ struct BarRowView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(bar.displayName)
+                    Text(bar.name ?? "Unknown")
                         .font(.headline)
-                    Text(bar.displayNameJapanese)
+                    Text(bar.nameJapanese ?? "")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -22,11 +22,11 @@ struct BarRowView: View {
                 }
             }
             
-            if bar.hasPhotos {
+            if let photoURLs = bar.photoURLs as? [String], !photoURLs.isEmpty {
                 HStack {
                     Image(systemName: "photo")
                         .font(.caption)
-                    Text("\(bar.photoCount) photo\(bar.photoCount > 1 ? "s" : "")")
+                    Text("\(photoURLs.count) photo\(photoURLs.count > 1 ? "s" : "")")
                         .font(.caption)
                 }
                 .foregroundColor(.blue)
@@ -36,13 +36,4 @@ struct BarRowView: View {
     }
 }
 
-#Preview {
-    let context = PersistenceController.preview.container.viewContext
-    let bar = Bar(context: context)
-    bar.name = "Test Bar"
-    bar.nameJapanese = "テストバー"
-    bar.visited = true
-    bar.photoURLs = ["photo1.jpg"]
-    
-    return BarRowView(bar: bar)
-}
+

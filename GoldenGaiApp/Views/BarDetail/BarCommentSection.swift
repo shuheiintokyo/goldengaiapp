@@ -151,24 +151,3 @@ struct CommentRowView: View {
     }
 }
 
-#Preview {
-    let comments = [
-        BarComment(
-            id: "c1",
-            barUUID: "bar-001",
-            author: "Traveler",
-            content: "Great atmosphere!",
-            language: .english,
-            rating: 5.0,
-            createdAt: Date(),
-            updatedAt: nil
-        )
-    ]
-    
-    let context = PersistenceController.preview.container.viewContext
-    let bar = Bar(context: context)
-    bar.name = "Test Bar"
-    
-    return BarCommentSection(bar: bar, comments: comments)
-        .padding()
-}

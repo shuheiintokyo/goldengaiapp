@@ -8,11 +8,11 @@ struct BarDetailHeader: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(bar.displayName)
+                    Text(bar.name ?? "Unknown Bar")
                         .font(.title2)
                         .fontWeight(.bold)
                     
-                    Text(bar.displayNameJapanese)
+                    Text(bar.nameJapanese ?? "")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -40,16 +40,4 @@ struct BarDetailHeader: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
     }
-}
-
-#Preview {
-    let context = PersistenceController.preview.container.viewContext
-    let bar = Bar(context: context)
-    bar.name = "Test Bar"
-    bar.nameJapanese = "テストバー"
-    bar.visited = true
-    bar.visitedDate = Date()
-    
-    return BarDetailHeader(bar: bar, onMarkVisited: {})
-        .padding()
 }

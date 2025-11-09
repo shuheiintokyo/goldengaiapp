@@ -1,12 +1,7 @@
-//
-//  CodableTransformer.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/08.
-//
-
+import UIKit
 import Foundation
 import CoreData
+import Combine
 
 // MARK: - Transformable Codable Value Transformer
 
@@ -99,11 +94,11 @@ struct CoreDataMigration {
         
         for bar in bars {
             // Ensure arrays are properly formatted
-            if bar.photoURLs.isEmpty {
-                bar.photoURLs = []
+            if bar.photoURLs == nil || bar.photoURLs?.count == 0 {
+                bar.photoURLs = [] as NSArray
             }
-            if bar.tags.isEmpty {
-                bar.tags = []
+            if bar.tags == nil || bar.tags?.count == 0 {
+                bar.tags = [] as NSArray
             }
         }
         

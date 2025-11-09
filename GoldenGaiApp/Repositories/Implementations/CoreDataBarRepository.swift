@@ -42,7 +42,7 @@ class CoreDataBarRepository: BarRepository {
         
         do {
             try context.save()
-            print("✅ Bar updated: \(bar.displayName)")
+            print("✅ Bar updated: \(bar.name ?? "Unknown") ")
         } catch {
             print("❌ Failed to update bar: \(error.localizedDescription)")
             throw BarError.failedToUpdate(reason: error.localizedDescription)
@@ -54,7 +54,7 @@ class CoreDataBarRepository: BarRepository {
         
         do {
             try context.save()
-            print("✅ Bar deleted: \(bar.displayName)")
+            print("✅ Bar deleted: \(bar.name ?? "Unknown") ")
         } catch {
             print("❌ Failed to delete bar: \(error.localizedDescription)")
             throw BarError.failedToUpdate(reason: error.localizedDescription)
@@ -70,7 +70,7 @@ class CoreDataBarRepository: BarRepository {
         bar.visitedDate = timestamp
         
         try update(bar)
-        print("✅ Bar marked as visited: \(bar.displayName)")
+        print("✅ Bar marked as visited: \(bar.name ?? "Unknown") ")
     }
     
     func addPhoto(_ uuid: String, photoURL: String) throws {
@@ -78,10 +78,18 @@ class CoreDataBarRepository: BarRepository {
             throw BarError.notFound(uuid: uuid)
         }
         
-        if !bar.photoURLs.contains(photoURL) {
-            bar.photoURLs.append(photoURL)
+        if let currentURLs = bar.photoURLs as? [String] {
+            if !currentURLs.contains(photoURL) {
+                var updatedURLs = currentURLs
+                updatedURLs.append(photoURL)
+                bar.photoURLs = updatedURLs as NSArray
+                try update(bar)
+                print("✅ Photo added to bar: \(bar.name ?? "Unknown") ")
+            }
+        } else {
+            bar.photoURLs = [photoURL] as NSArray
             try update(bar)
-            print("✅ Photo added to bar: \(bar.displayName)")
+            print("✅ Photo added to bar: \(bar.name ?? "Unknown") ")
         }
     }
     
@@ -92,7 +100,7 @@ class CoreDataBarRepository: BarRepository {
         
         // Store comment in a way that can be synced
         // This will be handled by cloud repository
-        print("✅ Comment recorded for bar: \(bar.displayName)")
+        print("✅ Comment recorded for bar: \(bar.name ?? "Unknown") ")
     }
     
     // MARK: - Additional Methods

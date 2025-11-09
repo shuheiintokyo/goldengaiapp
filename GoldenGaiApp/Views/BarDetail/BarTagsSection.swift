@@ -10,14 +10,14 @@ struct BarTagsSection: View {
                 .font(.headline)
             
             VStack(alignment: .leading, spacing: 12) {
-                if !bar.tags.isEmpty {
+                if let tags = bar.tags as? [String], !tags.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Tags")
                             .font(.caption)
                             .fontWeight(.semibold)
                             .foregroundColor(.secondary)
                         
-                        FlowLayout(items: bar.tags) { tag in
+                        FlowLayout(items: tags) { tag in
                             FeatureTag(tag: tag)
                         }
                     }
@@ -56,17 +56,4 @@ struct BarTagsSection: View {
     }
 }
 
-#Preview {
-    let context = PersistenceController.preview.container.viewContext
-    let bar = Bar(context: context)
-    bar.tags = ["intimate", "historic", "cozy"]
-    
-    let barInfo = BarInfo(
-        id: "bar-001",
-        features: ["Vintage", "Quiet"],
-        specialties: ["Sake", "Whisky"]
-    )
-    
-    return BarTagsSection(bar: bar, barInfo: barInfo)
-        .padding()
-}
+

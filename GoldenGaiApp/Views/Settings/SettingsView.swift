@@ -7,11 +7,11 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             Form {
-                LanguageSettingsSection()
+                LanguageSettingsSection(viewModel: viewModel)
                     .environmentObject(appState)
                     .environmentObject(viewModel)
                 
-                BackgroundSettingsSection()
+                BackgroundSettingsSection(viewModel: viewModel)
                     .environmentObject(appState)
                     .environmentObject(viewModel)
                 
@@ -20,7 +20,7 @@ struct SettingsView: View {
                 
                 AppInfoSection()
                 
-                AccountSection()
+                AccountSection(viewModel: viewModel)
                     .environmentObject(appState)
                     .environmentObject(viewModel)
             }

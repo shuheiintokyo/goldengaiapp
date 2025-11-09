@@ -25,10 +25,10 @@ struct BarPhotoSection: View {
                 .disabled(isUploading)
             }
             
-            if !bar.photoURLs.isEmpty {
+            if let photoURLs = bar.photoURLs as? [String], !photoURLs.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        ForEach(bar.photoURLs, id: \.self) { photoURL in
+                        ForEach(photoURLs, id: \.self) { photoURL in
                             AsyncImage(url: URL(string: photoURL)) { phase in
                                 switch phase {
                                 case .empty:
@@ -113,12 +113,4 @@ struct BarPhotoSection: View {
     }
 }
 
-#Preview {
-    let context = PersistenceController.preview.container.viewContext
-    let bar = Bar(context: context)
-    bar.name = "Test Bar"
-    bar.photoURLs = []
-    
-    return BarPhotoSection(bar: bar)
-        .padding()
-}
+
