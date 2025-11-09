@@ -3,7 +3,6 @@ import SwiftUI
 struct BarListView: View {
     @StateObject var viewModel = BarListViewModel()
     @EnvironmentObject var appState: AppState
-    @State private var showSearchView = false
     
     var body: some View {
         NavigationView {
@@ -13,23 +12,10 @@ struct BarListView: View {
                 
                 VStack(spacing: 0) {
                     // Search Bar
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.gray)
-                        
-                        TextField("Search bars", text: $viewModel.searchText)
-                            .textFieldStyle(.roundedBorder)
-                        
-                        if !viewModel.searchText.isEmpty {
-                            Button(action: { viewModel.searchText = "" }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                    }
-                    .padding()
+                    SearchBar(text: $viewModel.searchText)
+                        .padding(.vertical, 8)
                     
-                    // Statistics
+                    // Statistics Card
                     HStack(spacing: 16) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Visited")
@@ -57,7 +43,7 @@ struct BarListView: View {
                     .padding()
                     .background(Color(.systemGray6))
                     
-                    // Bar List
+                    // Bar List Content
                     if viewModel.isLoading {
                         VStack(spacing: 12) {
                             ProgressView()
@@ -109,75 +95,6 @@ struct BarListView: View {
                 }
             }
         }
-    }
-}
-
-struct BarRowView: View {
-    let bar: Bar
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(bar.name ?? "Unknown Bar")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    
-                    if let japaneseeName = bar.nameJapanese, !japaneseeName.isEmpty {
-                        Text(japaneseeName)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                
-                Spacer()
-                
-                // Visited Status
-                if bar.visited {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(.green)
-                } else {
-                    Image(systemName: "circle")
-                        .font(.title3)
-                        .foregroundColor(.gray)
-                        .opacity(0.3)
-                }
-            }
-            
-            // Bar Metadata
-            HStack(spacing: 12) {
-                if let photoURLs = bar.photoURLs as? [String], !photoURLs.isEmpty {
-                    HStack(spacing: 4) {
-                        Image(systemName: "photo")
-                            .font(.caption)
-                        Text("\(photoURLs.count)")
-                            .font(.caption)
-                    }
-                    .foregroundColor(.blue)
-                }
-                
-                if let tags = bar.tags as? [String], !tags.isEmpty {
-                    HStack(spacing: 4) {
-                        Image(systemName: "tag")
-                            .font(.caption)
-                        Text("\(tags.count)")
-                            .font(.caption)
-                    }
-                    .foregroundColor(.orange)
-                }
-                
-                Spacer()
-                
-                // Last Synced
-                if let lastSync = bar.lastSyncedDate {
-                    Text(lastSync.formatted(date: .abbreviated, time: .omitted))
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-        .padding(.vertical, 8)
     }
 }
 
