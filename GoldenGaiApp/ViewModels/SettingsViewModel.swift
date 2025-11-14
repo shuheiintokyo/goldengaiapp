@@ -17,6 +17,7 @@ class SettingsViewModel: ObservableObject {
     private var preferencesRepository: PreferencesRepository
     private let syncService: SyncService
     
+    // FIXED: Add @MainActor to init to ensure thread safety
     @MainActor
     init(
         preferencesRepository: PreferencesRepository = AppStoragePreferencesRepository.shared,
@@ -25,6 +26,7 @@ class SettingsViewModel: ObservableObject {
         self.preferencesRepository = preferencesRepository
         self.syncService = syncService ?? SyncService()
         loadSettings()
+        print("✅ SettingsViewModel initialized on MainActor")
     }
     
     func loadSettings() {
@@ -38,11 +40,13 @@ class SettingsViewModel: ObservableObject {
         showEnglish = english
         preferencesRepository.showEnglish = english
         preferencesRepository.save()
+        print("✅ Language updated: \(english ? "English" : "Japanese")")
     }
     
     func updateBackground(_ name: String, for view: String) {
         preferencesRepository.backgroundPreference = name
         preferencesRepository.save()
+        print("✅ Background updated for \(view): \(name)")
     }
     
     func performSync() async {
@@ -52,8 +56,10 @@ class SettingsViewModel: ObservableObject {
         do {
             try await syncService.performFullSync()
             lastSyncDate = syncService.lastSyncDate
+            print("✅ Sync completed successfully")
         } catch {
             syncError = (error as? LocalizedError)?.errorDescription ?? "Sync failed"
+            print("❌ Sync failed: \(syncError ?? "Unknown error")")
         }
         
         isSyncing = false
@@ -62,5 +68,6 @@ class SettingsViewModel: ObservableObject {
     func logout() {
         preferencesRepository.logout()
         isLoggedIn = false
+        print("✅ User logged out")
     }
 }

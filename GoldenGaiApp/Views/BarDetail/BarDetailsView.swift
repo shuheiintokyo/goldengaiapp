@@ -93,13 +93,14 @@ struct BarDetailView: View {
                         }
                     }
                     
-                    // Comments Section
+                    // Comments Section - FIXED: Add handler
                     BarCommentSection(
                         bar: bar,
-                        comments: viewModel.comments
-                    ) { content, language in
-                        try viewModel.addComment(content, language: language)
-                    }
+                        comments: viewModel.comments,
+                        onAddComment: { content, language in
+                            try viewModel.addComment(content, language: language)
+                        }
+                    )
                 } else {
                     // Loading state
                     VStack(spacing: 12) {
@@ -116,6 +117,7 @@ struct BarDetailView: View {
         }
         .navigationTitle(bar.name ?? "Bar Details")
         .navigationBarTitleDisplayMode(.inline)
+        // FIXED: Add onAppear to load bar details
         .onAppear {
             if let uuid = bar.uuid {
                 viewModel.loadBarDetails(uuid: uuid)
@@ -140,12 +142,5 @@ struct DetailRow: View {
                 .font(.caption)
                 .fontWeight(.semibold)
         }
-    }
-}
-
-#Preview {
-    NavigationView {
-        BarDetailView(bar: Bar(entity: NSEntityDescription(), insertInto: nil))
-            .environmentObject(AppState())
     }
 }

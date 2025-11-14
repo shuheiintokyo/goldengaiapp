@@ -15,10 +15,17 @@ class ContentViewModel: ObservableObject {
         checkFirstLaunch()
     }
     
+    // FIXED: Proper first-launch detection with UserDefaults
     func checkFirstLaunch() {
-        // Show welcome only on first launch
-        if preferencesRepository.isLoggedIn {
+        let hasLaunchedBefore = UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
+        
+        if !hasLaunchedBefore {
+            showWelcome = true
+            UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
+            print("✅ First launch - showing welcome")
+        } else {
             showWelcome = false
+            print("✅ Returning user - hiding welcome")
         }
     }
     
