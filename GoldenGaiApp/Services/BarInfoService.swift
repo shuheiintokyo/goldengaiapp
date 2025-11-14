@@ -121,23 +121,3 @@ class BarInfoService: ObservableObject {
         return barInfoCache.count
     }
 }
-
-// MARK: - Mock Extension for Preview
-
-#if DEBUG
-extension BarInfoService {
-    static var preview: BarInfoService {
-        let service = BarInfoService()
-        service.barInfoCache = [
-            "bar-001": .preview,
-            "bar-002": BarInfo(
-                id: "bar-002",
-                detailedDescription: "Another great bar in Golden Gai",
-                specialties: ["Japanese Whisky", "Craft Beer"],
-                features: ["Friendly Owner", "Good Music"]
-            )
-        ]
-        return service
-    }
-}
-#endif

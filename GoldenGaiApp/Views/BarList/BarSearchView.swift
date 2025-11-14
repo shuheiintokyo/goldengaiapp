@@ -1,4 +1,6 @@
+import Foundation
 import SwiftUI
+import CoreData
 
 struct BarSearchView: View {
     @StateObject var viewModel = BarListViewModel()
