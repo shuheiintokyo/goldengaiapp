@@ -4,7 +4,7 @@ struct SearchBar: View {
     @Binding var text: String
     
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
                 .font(.caption)
@@ -20,10 +20,15 @@ struct SearchBar: View {
                 }
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
         .background(Color(.systemGray6))
         .cornerRadius(6)
-        .frame(maxWidth: .infinity)
     }
+}
+
+#Preview {
+    @State var text = ""
+    return SearchBar(text: $text)
+        .padding()
 }
