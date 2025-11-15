@@ -1,4 +1,4 @@
-// MapView.swift - GoldenGaiApp Version (CLEAN & WORKING)
+// MapView.swift - FIXED VERSION
 import SwiftUI
 import CoreData
 
@@ -18,32 +18,37 @@ struct MapView: View {
     @State private var pendingBarHighlight: String = ""
     @State private var retryCount = 0
     @State private var hasProcessedInitial = false
+    @State private var navigationPath = NavigationPath()
     
     var body: some View {
-        ZStack {
-            DynamicBackgroundImage(imageName: "BarMapBackground")
-                .ignoresSafeArea()
-            
-            MapGridView(
-                highlightedBarUUID: highlightedBarUUID,
-                showEnglish: showEnglish,
-                onBarSelected: { bar in
-                    selectedBar = bar
-                    MapHaptics.selectionHaptic()
-                },
-                onHighlightChange: { uuid in
-                    highlightedBarUUID = uuid
-                }
-            )
-        }
-        .navigationTitle("")
-        .navigationBarHidden(true)
-        .navigationDestination(for: Bar.self) { bar in
-            BarDetailView(bar: bar)
-        }
-        .sheet(item: $selectedBar) { bar in
-            NavigationStack {
+        NavigationStack(path: $navigationPath) {
+            ZStack {
+                DynamicBackgroundImage(imageName: "BarMapBackground")
+                    .ignoresSafeArea()
+                
+                MapGridView(
+                    highlightedBarUUID: highlightedBarUUID,
+                    showEnglish: showEnglish,
+                    onBarSelected: { bar in
+                        selectedBar = bar
+                        navigationPath.append(bar)  // ← Use NavigationStack path
+                        MapHaptics.selectionHaptic()
+                    },
+                    onHighlightChange: { uuid in
+                        highlightedBarUUID = uuid
+                    }
+                )
+            }
+            .navigationTitle("")
+            .navigationBarHidden(true)
+            // ✅ FIXED: Use navigationDestination in the NavigationStack context
+            .navigationDestination(for: Bar.self) { bar in
                 BarDetailView(bar: bar)
+            }
+            .sheet(item: $selectedBar) { bar in
+                NavigationStack {
+                    BarDetailView(bar: bar)
+                }
             }
         }
         .onAppear {

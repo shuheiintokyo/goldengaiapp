@@ -5,6 +5,7 @@ import CoreData
 struct BarListView: View {
     @StateObject var viewModel = BarListViewModel()
     @EnvironmentObject var appState: AppState
+    @State private var didLoad = false
     
     var body: some View {
         NavigationView {
@@ -92,15 +93,27 @@ struct BarListView: View {
                 }
             }
             .onAppear {
-                if viewModel.bars.isEmpty {
+                print("📋 BarListView appeared")
+                if !didLoad {
+                    didLoad = true
+                    print("🔄 Loading bars from repository...")
                     viewModel.loadBars()
+                } else {
+                    print("✅ Bars already loaded, count: \(viewModel.bars.count)")
                 }
+            }
+            .onChange(of: viewModel.selectedSortOption) { _ in
+                print("🔀 Sort option changed to: \(viewModel.selectedSortOption.rawValue)")
+                viewModel.updateFilteredBars()
+            }
+            .onChange(of: viewModel.showVisitedOnly) { newValue in
+                print("🔍 Visited filter toggled: \(newValue)")
+                viewModel.updateFilteredBars()
+            }
+            .onChange(of: viewModel.searchText) { newValue in
+                print("🔎 Search text changed: \(newValue)")
+                viewModel.updateFilteredBars()
             }
         }
     }
-}
-
-#Preview {
-    BarListView()
-        .environmentObject(AppState())
 }

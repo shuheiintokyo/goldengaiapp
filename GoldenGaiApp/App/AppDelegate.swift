@@ -81,7 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("✅ Appearance configured")
     }
     
-    // MARK: - Initial Data Seeding
+    // MARK: - Initial Data Seeding (IMPROVED)
     
     private func seedInitialDataIfNeeded() {
         let viewContext = persistenceController.container.viewContext
@@ -89,16 +89,77 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         do {
             let existingBars = try viewContext.fetch(fetchRequest)
+            
             if existingBars.isEmpty {
-                print("🌱 Seeding initial bar data...")
-                DataSeeder.seedInitialBars(into: viewContext)
-                try viewContext.save()
-                print("✅ Initial data seeded successfully")
+                print("🌱 Starting data seeding...")
+                
+                // Load map.json
+                guard let mapURL = Bundle.main.url(forResource: "map", withExtension: "json") else {
+                    print("❌ map.json not found in bundle")
+                    return
+                }
+                
+                do {
+                    let mapData = try Data(contentsOf: mapURL)
+                    let mapJSON = try JSONSerialization.jsonObject(with: mapData) as? [String: Any]
+                    
+                    guard let mapArray = mapJSON?["map"] as? [[String]] else {
+                        print("❌ Invalid map structure in map.json")
+                        return
+                    }
+                    
+                    var barCount = 0
+                    var uuidMap: [String: String] = [:]  // barName -> uuid for reference
+                    
+                    print("📍 Parsing map with \(mapArray.count) rows...")
+                    
+                    // Parse map and create bars
+                    for (row, rowData) in mapArray.enumerated() {
+                        for (col, barName) in rowData.enumerated() {
+                            // Skip empty cells and placeholders
+                            if barName.isEmpty || barName == "*" {
+                                continue
+                            }
+                            
+                            let bar = Bar(context: viewContext)
+                            let barUUID = UUID().uuidString
+                            
+                            bar.uuid = barUUID
+                            bar.name = barName
+                            bar.nameJapanese = barName  // TODO: Load from barinfo.json
+                            bar.locationRow = Int16(row)
+                            bar.locationColumn = Int16(col)
+                            bar.cellSpanHorizontal = 1
+                            bar.cellSpanVertical = 1
+                            bar.visited = false
+                            bar.photoURLs = []
+                            bar.tags = []
+                            bar.lastSyncedDate = Date()
+                            
+                            uuidMap[barName] = barUUID
+                            barCount += 1
+                        }
+                    }
+                    
+                    // Save to Core Data
+                    if barCount > 0 {
+                        try viewContext.save()
+                        print("✅ Successfully seeded \(barCount) bars into Core Data")
+                    } else {
+                        print("⚠️ No bars were created from map")
+                    }
+                    
+                } catch let parseError as NSError {
+                    print("❌ Error parsing map.json: \(parseError.localizedDescription)")
+                    print("   Error domain: \(parseError.domain)")
+                    print("   Error code: \(parseError.code)")
+                }
+                
             } else {
-                print("✅ Database already contains \(existingBars.count) bars")
+                print("✅ Database already seeded with \(existingBars.count) bars")
             }
         } catch {
-            print("❌ Error checking for initial data: \(error.localizedDescription)")
+            print("❌ Error checking existing bars: \(error.localizedDescription)")
         }
     }
 }
