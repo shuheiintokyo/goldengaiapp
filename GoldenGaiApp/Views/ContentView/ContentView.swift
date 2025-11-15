@@ -1,4 +1,6 @@
+import Foundation
 import SwiftUI
+import Combine
 
 struct ContentView: View {
     @EnvironmentObject var appState: AppState

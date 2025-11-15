@@ -148,3 +148,10 @@ enum TagCategory: String, Codable, CaseIterable {
         }
     }
 }
+
+enum SortOption: String, CaseIterable, Hashable {
+    case nameAscending = "Name (A-Z)"
+    case nameDescending = "Name (Z-A)"
+    case recentlyVisited = "Recently Visited"
+    case rating = "Rating"
+}

@@ -312,3 +312,4 @@ class MapHaptics {
         notificationFeedback.notificationOccurred(.warning)
     }
 }
+

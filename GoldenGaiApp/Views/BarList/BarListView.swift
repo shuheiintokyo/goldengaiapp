@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import CoreData
 
 struct BarListView: View {
     @StateObject var viewModel = BarListViewModel()
