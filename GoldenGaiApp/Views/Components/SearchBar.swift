@@ -1,30 +1,29 @@
-//
-//  SearchBar.swift
-//  GoldenGaiApp
-//
-//  Created by Shuhei Kinugasa on 2025/11/09.
-//
-
 import SwiftUI
 
 struct SearchBar: View {
     @Binding var text: String
     
     var body: some View {
-        HStack {
+        HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
+                .font(.caption)
             
             TextField("Search", text: $text)
-                .textFieldStyle(.roundedBorder)
+                .font(.body)
             
             if !text.isEmpty {
                 Button(action: { text = "" }) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.gray)
+                        .font(.caption)
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(Color(.systemGray6))
+        .cornerRadius(6)
+        .frame(maxWidth: .infinity)
     }
 }

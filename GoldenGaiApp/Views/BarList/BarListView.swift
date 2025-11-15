@@ -9,13 +9,13 @@ struct BarListView: View {
     
     var body: some View {
         ZStack {
-            // Background - FIXED: Behind everything
+            // Background - Behind everything
             DynamicBackgroundImage(imageName: appState.barListViewBackground)
                 .ignoresSafeArea()
             
-            // Content - FIXED: Separate from background
+            // Content - Constrained within safe area
             VStack(spacing: 0) {
-                // Header Section
+                // Header Section - Fixed height
                 VStack(spacing: 0) {
                     // Navigation Title + Menu
                     HStack {
@@ -39,50 +39,55 @@ struct BarListView: View {
                             Image(systemName: "line.3.horizontal.decrease")
                         }
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
                     .background(Color(.systemBackground).opacity(0.9))
                     
-                    // Search Bar
+                    // Search Bar - Properly constrained
                     SearchBar(text: $viewModel.searchText)
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color(.systemBackground).opacity(0.9))
                     
-                    // Statistics Card
-                    HStack(spacing: 16) {
-                        VStack(alignment: .leading, spacing: 4) {
+                    // Statistics Card - Properly constrained
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text("Visited")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
-                            HStack(spacing: 4) {
+                            HStack(spacing: 2) {
                                 Text("\(viewModel.visitedCount)")
-                                    .font(.headline)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
                                 Text("/ \(viewModel.totalCount)")
-                                    .font(.caption)
+                                    .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
                         }
                         
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text("Progress")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                             ProgressView(value: viewModel.visitedPercentage / 100)
-                                .frame(width: 100)
+                                .frame(maxWidth: 80)
                         }
                         
                         Spacer()
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
                     .background(Color(.systemGray6).opacity(0.9))
                 }
                 
-                // Bar List Content - FIXED: Proper scrolling list
+                // Bar List Content - Scrollable, properly constrained
                 ZStack {
                     if viewModel.isLoading {
                         VStack(spacing: 12) {
                             ProgressView()
                             Text("Loading bars...")
                                 .foregroundColor(.secondary)
+                                .font(.body)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     } else if viewModel.filteredBars.isEmpty {
@@ -92,25 +97,27 @@ struct BarListView: View {
                                 .foregroundColor(.gray)
                             Text("No bars found")
                                 .foregroundColor(.secondary)
+                                .font(.body)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     } else {
-                        ScrollView {
-                            VStack(spacing: 0) {
+                        ScrollView(.vertical, showsIndicators: true) {
+                            LazyVStack(spacing: 4) {
                                 ForEach(viewModel.filteredBars) { bar in
                                     NavigationLink(destination: BarDetailView(bar: bar)) {
                                         BarRowView(bar: bar)
-                                            .padding(.vertical, 8)
-                                            .padding(.horizontal)
                                     }
                                 }
                             }
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
                         }
                         .background(Color.clear)
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .ignoresSafeArea(edges: .bottom)
         }
         .onAppear {
             print("📋 BarListView appeared")
