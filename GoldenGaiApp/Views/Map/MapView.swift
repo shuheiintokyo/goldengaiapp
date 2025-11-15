@@ -1,15 +1,230 @@
+// MapView.swift - GoldenGaiApp Version (CLEAN & WORKING)
 import SwiftUI
 import CoreData
+
+struct MapView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Bar.locationRow, ascending: true)],
+        animation: .default)
+    private var bars: FetchedResults<Bar>
+    
+    @State private var selectedBar: Bar?
+    @State private var highlightedBarUUID: String? = nil
+    @AppStorage("showEnglish") var showEnglish = false
+    
+    var initialHighlightUUID: String? = nil
+    
+    @State private var pendingBarHighlight: String = ""
+    @State private var retryCount = 0
+    @State private var hasProcessedInitial = false
+    
+    var body: some View {
+        ZStack {
+            DynamicBackgroundImage(imageName: "BarMapBackground")
+                .ignoresSafeArea()
+            
+            MapGridView(
+                highlightedBarUUID: highlightedBarUUID,
+                showEnglish: showEnglish,
+                onBarSelected: { bar in
+                    selectedBar = bar
+                    MapHaptics.selectionHaptic()
+                },
+                onHighlightChange: { uuid in
+                    highlightedBarUUID = uuid
+                }
+            )
+        }
+        .navigationTitle("")
+        .navigationBarHidden(true)
+        .navigationDestination(for: Bar.self) { bar in
+            BarDetailView(bar: bar)
+        }
+        .sheet(item: $selectedBar) { bar in
+            NavigationStack {
+                BarDetailView(bar: bar)
+            }
+        }
+        .onAppear {
+            setupTabBar()
+            setupNotificationObserver()
+            
+            if let pendingUUID = UserDefaults.standard.string(forKey: "pendingHighlightUUID"),
+               !pendingUUID.isEmpty {
+                print("🎯 MapView.onAppear: Found pending highlight UUID in UserDefaults: \(pendingUUID)")
+                UserDefaults.standard.removeObject(forKey: "pendingHighlightUUID")
+                processHighlightImmediately(pendingUUID)
+            }
+            else if !hasProcessedInitial {
+                hasProcessedInitial = true
+                
+                if let uuid = initialHighlightUUID, !uuid.isEmpty {
+                    print("🎯 MapView.onAppear: Processing initialHighlightUUID: \(uuid)")
+                    processHighlightImmediately(uuid)
+                } else {
+                    print("⏳ MapView.onAppear: No initial UUID provided")
+                }
+            }
+        }
+        .onChange(of: bars.count) { newValue in
+            if newValue > 0 && !pendingBarHighlight.isEmpty {
+                print("📊 Bars loaded (\(newValue)), checking pending highlight: \(pendingBarHighlight)")
+                checkForPendingHighlight()
+            }
+        }
+        .background(.clear)
+        .presentationBackground(.ultraThinMaterial)
+        .onDisappear {
+            highlightedBarUUID = nil
+            pendingBarHighlight = ""
+            retryCount = 0
+            hasProcessedInitial = false
+        }
+    }
+    
+    // MARK: - Highlight Processing
+    
+    private func processHighlightImmediately(_ uuid: String) {
+        print("⚡ Attempting immediate highlight for UUID: \(uuid)")
+        print("   Bars available: \(bars.count)")
+        
+        if bars.isEmpty {
+            print("   ⏳ Bars not loaded yet, will retry...")
+            retryCount = 0
+            pendingBarHighlight = uuid
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                checkForPendingHighlight()
+            }
+            return
+        }
+        
+        if let targetBar = bars.first(where: { $0.uuid == uuid }) {
+            print("   ✅ Found bar immediately: \(targetBar.name ?? "unknown")")
+            
+            withAnimation(.easeInOut(duration: 0.3)) {
+                self.highlightedBarUUID = uuid
+            }
+            
+            MapHaptics.successHaptic()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                withAnimation {
+                    self.highlightedBarUUID = nil
+                }
+            }
+        } else {
+            print("   ❌ Bar not found immediately, starting retry logic...")
+            retryCount = 0
+            pendingBarHighlight = uuid
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                checkForPendingHighlight()
+            }
+        }
+    }
+    
+    private func checkForPendingHighlight() {
+        guard !pendingBarHighlight.isEmpty else { return }
+        
+        print("🔍 MapView checking for pending highlight: \(pendingBarHighlight)")
+        print("   Bars loaded: \(bars.count)")
+        print("   Retry count: \(retryCount)")
+        
+        if bars.isEmpty && retryCount < 5 {
+            retryCount += 1
+            print("   ⏳ Bars not loaded, retrying in 0.5s... (attempt \(retryCount)/5)")
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                checkForPendingHighlight()
+            }
+            return
+        }
+        
+        if let targetBar = bars.first(where: { $0.uuid == pendingBarHighlight }) {
+            print("   ✅ Found bar to highlight: \(targetBar.name ?? "unknown")")
+            
+            highlightedBarUUID = nil
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    self.highlightedBarUUID = self.pendingBarHighlight
+                }
+                
+                MapHaptics.successHaptic()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.pendingBarHighlight = ""
+                    self.retryCount = 0
+                }
+            }
+        } else if retryCount < 5 {
+            retryCount += 1
+            print("   ⚠️ Bar with UUID \(pendingBarHighlight) not found, retrying... (attempt \(retryCount)/5)")
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                checkForPendingHighlight()
+            }
+        } else {
+            print("   ❌ Failed to find bar after 5 attempts, clearing pending highlight")
+            MapHaptics.warningHaptic()
+            pendingBarHighlight = ""
+            retryCount = 0
+        }
+    }
+    
+    // MARK: - UI Configuration
+    
+    private func setupTabBar() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor.black.withAlphaComponent(0.85)
+        appearance.backgroundEffect = UIBlurEffect(style: .dark)
+        
+        let normalColor = UIColor.white.withAlphaComponent(0.6)
+        let selectedColor = UIColor.systemBlue
+        
+        appearance.stackedLayoutAppearance.normal.iconColor = normalColor
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: normalColor]
+        appearance.stackedLayoutAppearance.selected.iconColor = selectedColor
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedColor]
+        
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                windowScene.windows.forEach { window in
+                    window.allSubviews.forEach { view in
+                        if let tabBar = view as? UITabBar {
+                            tabBar.standardAppearance = appearance
+                            tabBar.scrollEdgeAppearance = appearance
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func setupNotificationObserver() {
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("HighlightBar"),
+            object: nil,
+            queue: .main) { notification in
+                if let uuid = notification.userInfo?["barUUID"] as? String,
+                   !uuid.isEmpty {
+                    print("🎯 MapView received highlight notification for UUID: \(uuid)")
+                    self.processHighlightImmediately(uuid)
+                }
+            }
+    }
+}
 
 // MARK: - Bar Extension for Map Display
 
 extension Bar {
-    /// Returns emoji indicator for bar status
     var statusEmoji: String {
         visited ? "🟢" : "🔵"
     }
     
-    /// Returns formatted display name for map
     var mapDisplayName: String {
         if let name = name, !name.isEmpty {
             return name
@@ -17,18 +232,15 @@ extension Bar {
         return "Unknown"
     }
     
-    /// Returns full display with Japanese name
     var fullMapDisplay: String {
         let primaryName = mapDisplayName
         if let japaneseName = nameJapanese, !japaneseName.isEmpty {
-            return "\(primaryName)\n(japaneseName)"
+            return "\(primaryName)\n(\(japaneseName))"
         }
         return primaryName
     }
     
-    /// Calculates distance from another bar (if coordinates were available)
     func distanceFrom(_ bar: Bar) -> Double {
-        // TODO: Implement when location data is available
         return 0
     }
 }
@@ -49,14 +261,12 @@ extension Array where Element == Bar {
         return Double(visitedCount) / Double(count) * 100
     }
     
-    /// Returns bars grouped by visit status
     var groupedByVisitStatus: (visited: [Bar], unvisited: [Bar]) {
         let visited = filter { $0.visited }
         let unvisited = filter { !$0.visited }
         return (visited, unvisited)
     }
     
-    /// Returns most recently visited bars
     func sortedByVisitDate() -> [Bar] {
         sorted { bar1, bar2 in
             let date1 = bar1.visitedDate ?? .distantPast
@@ -65,38 +275,12 @@ extension Array where Element == Bar {
         }
     }
     
-    /// Filters bars by search text
     func search(_ text: String) -> [Bar] {
         guard !text.isEmpty else { return self }
         return filter { bar in
             bar.name?.localizedCaseInsensitiveContains(text) ?? false ||
             bar.nameJapanese?.localizedCaseInsensitiveContains(text) ?? false
         }
-    }
-}
-
-// MARK: - SwiftUI View Modifiers for Map
-
-struct MapCellModifier: ViewModifier {
-    let isSelected: Bool
-    
-    func body(content: Content) -> some View {
-        content
-            .background(isSelected ? Color.blue.opacity(0.08) : Color.clear)
-            .cornerRadius(8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(
-                        isSelected ? Color.blue : Color.gray.opacity(0.2),
-                        lineWidth: isSelected ? 2 : 1
-                    )
-            )
-    }
-}
-
-extension View {
-    func mapCellStyle(isSelected: Bool) -> some View {
-        modifier(MapCellModifier(isSelected: isSelected))
     }
 }
 
@@ -109,189 +293,8 @@ struct MapTheme {
     static let unvisitedBackgroundColor = Color.blue.opacity(0.15)
     static let selectionColor = Color.blue
     static let selectionBackgroundColor = Color.blue.opacity(0.08)
-}
-
-// MARK: - MapGridLayout Helper
-
-struct MapGridLayout {
-    static let defaultColumnCount = 5
-    static let defaultItemSpacing: CGFloat = 8
-    static let defaultPadding: CGFloat = 8
-    static let defaultCornerRadius: CGFloat = 10
-    
-    /// Calculates optimal column count based on screen width
-    static func optimalColumnCount(for screenWidth: CGFloat) -> Int {
-        let itemWidth: CGFloat = 70
-        let totalSpacing = defaultPadding * 2 + defaultItemSpacing * CGFloat(defaultColumnCount - 1)
-        let availableWidth = screenWidth - totalSpacing
-        return max(3, Int(availableWidth / itemWidth))
-    }
-}
-
-// MARK: - Map Export/Import Helpers
-
-struct MapDataExporter {
-    /// Exports map data to JSON format
-    static func exportToJSON(_ bars: [Bar]) -> Data? {
-        var data: [[String: Any]] = []
-        
-        for bar in bars {
-            var barData: [String: Any] = [
-                "uuid": bar.uuid ?? UUID().uuidString,
-                "name": bar.name ?? "",
-                "nameJapanese": bar.nameJapanese ?? "",
-                "visited": bar.visited
-            ]
-            
-            if let visitedDate = bar.visitedDate {
-                barData["visitedDate"] = ISO8601DateFormatter().string(from: visitedDate)
-            }
-            
-            if let photoURLs = bar.photoURLs as? [String] {
-                barData["photos"] = photoURLs
-            }
-            
-            data.append(barData)
-        }
-        
-        do {
-            return try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
-        } catch {
-            print("❌ Export error: \(error.localizedDescription)")
-            return nil
-        }
-    }
-    
-    /// Exports map statistics
-    static func exportStatistics(_ bars: [Bar]) -> [String: Any] {
-        return [
-            "totalBars": bars.count,
-            "visitedBars": bars.visitedCount,
-            "unvisitedBars": bars.unvisitedCount,
-            "percentageComplete": bars.visitedPercentage,
-            "exportDate": ISO8601DateFormatter().string(from: Date())
-        ]
-    }
-}
-
-// MARK: - Map Filtering Presets
-
-struct MapFilterPreset {
-    let name: String
-    let predicate: (Bar) -> Bool
-    
-    static let allBars = MapFilterPreset(
-        name: "All Bars",
-        predicate: { _ in true }
-    )
-    
-    static let visited = MapFilterPreset(
-        name: "Visited Only",
-        predicate: { $0.visited }
-    )
-    
-    static let unvisited = MapFilterPreset(
-        name: "Unvisited Only",
-        predicate: { !$0.visited }
-    )
-    
-    static let recent = MapFilterPreset(
-        name: "Recently Visited",
-        predicate: { $0.visited && $0.visitedDate != nil }
-    )
-    
-    static let allPresets: [MapFilterPreset] = [
-        .allBars,
-        .visited,
-        .unvisited,
-        .recent
-    ]
-}
-
-// MARK: - Map Search Helper
-
-class MapSearchHelper {
-    /// Performs fuzzy search on bars
-    static func fuzzySearch(_ query: String, in bars: [Bar]) -> [Bar] {
-        guard !query.isEmpty else { return bars }
-        
-        let lowercaseQuery = query.lowercased()
-        
-        return bars.filter { bar in
-            let nameMatch = bar.name?.lowercased().contains(lowercaseQuery) ?? false
-            let japaneseMatch = bar.nameJapanese?.contains(query) ?? false
-            
-            return nameMatch || japaneseMatch
-        }.sorted { bar1, bar2 in
-            // Prioritize bars that start with the query
-            let name1Starts = bar1.name?.lowercased().starts(with: lowercaseQuery) ?? false
-            let name2Starts = bar2.name?.lowercased().starts(with: lowercaseQuery) ?? false
-            
-            if name1Starts && !name2Starts {
-                return true
-            }
-            return false
-        }
-    }
-    
-    /// Returns search suggestions based on partial query
-    static func suggestions(for query: String, from bars: [Bar]) -> [String] {
-        guard !query.isEmpty else { return [] }
-        
-        let lowercaseQuery = query.lowercased()
-        
-        return bars.compactMap { bar in
-            if let name = bar.name, name.lowercased().starts(with: lowercaseQuery) {
-                return name
-            }
-            return nil
-        }
-        .removingDuplicates()
-        .prefix(5)
-        .map { String($0) }
-    }
-}
-
-// MARK: - Array Extension for Removing Duplicates
-
-extension Array where Element: Equatable {
-    func removingDuplicates() -> [Element] {
-        var result = [Element]()
-        for item in self {
-            if !result.contains(item) {
-                result.append(item)
-            }
-        }
-        return result
-    }
-}
-
-// MARK: - Map Accessibility
-
-struct MapAccessibilityLabel {
-    static func cellLabel(for bar: Bar) -> String {
-        let status = bar.visited ? "Visited" : "Unvisited"
-        let nameString = bar.name ?? "Unknown bar"
-        
-        if let japaneseeName = bar.nameJapanese {
-            return "\(nameString), \(japaneseeName), \(status)"
-        }
-        
-        return "\(nameString), \(status)"
-    }
-    
-    static func statisticsLabel(visited: Int, total: Int, percentage: Double) -> String {
-        let percentString = String(format: "%.0f", percentage)
-        return "Progress: \(visited) out of \(total) bars visited, \(percentString) percent complete"
-    }
-}
-
-// MARK: - Map Animation Helpers
-
-struct MapAnimations {
-    static let cellSelection = Animation.easeInOut(duration: 0.2)
-    static let panelAppearance = Animation.easeInOut(duration: 0.3)
-    static let gridRefresh = Animation.easeInOut(duration: 0.1)
+    static let highlightColor = Color.orange
+    static let highlightBackgroundColor = Color.orange.opacity(0.15)
 }
 
 // MARK: - Map Haptics
@@ -313,3 +316,15 @@ class MapHaptics {
     }
 }
 
+// MARK: - UIView Extension
+
+extension UIView {
+    var allSubviews: [UIView] {
+        var subviews = [UIView]()
+        for subview in self.subviews {
+            subviews.append(contentsOf: subview.allSubviews)
+            subviews.append(subview)
+        }
+        return subviews
+    }
+}

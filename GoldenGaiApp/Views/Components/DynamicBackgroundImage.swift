@@ -10,7 +10,3 @@ struct DynamicBackgroundImage: View {
             .ignoresSafeArea()
     }
 }
-
-#Preview {
-    DynamicBackgroundImage(imageName: "ContentBackground")
-}
