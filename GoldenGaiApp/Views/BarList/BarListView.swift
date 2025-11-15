@@ -8,14 +8,43 @@ struct BarListView: View {
     @State private var didLoad = false
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                // Background
-                DynamicBackgroundImage(imageName: appState.barListViewBackground)
-                
+        ZStack {
+            // Background - FIXED: Behind everything
+            DynamicBackgroundImage(imageName: appState.barListViewBackground)
+                .ignoresSafeArea()
+            
+            // Content - FIXED: Separate from background
+            VStack(spacing: 0) {
+                // Header Section
                 VStack(spacing: 0) {
+                    // Navigation Title + Menu
+                    HStack {
+                        Text("Golden Gai Bars")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                        
+                        Menu {
+                            Picker("Sort", selection: $viewModel.selectedSortOption) {
+                                ForEach(SortOption.allCases, id: \.self) { option in
+                                    Text(option.rawValue).tag(option)
+                                }
+                            }
+                            
+                            Divider()
+                            
+                            Toggle("Visited Only", isOn: $viewModel.showVisitedOnly)
+                        } label: {
+                            Image(systemName: "line.3.horizontal.decrease")
+                        }
+                    }
+                    .padding()
+                    .background(Color(.systemBackground).opacity(0.9))
+                    
                     // Search Bar
                     SearchBar(text: $viewModel.searchText)
+                        .padding(.horizontal)
                         .padding(.vertical, 8)
                     
                     // Statistics Card
@@ -44,16 +73,18 @@ struct BarListView: View {
                         Spacer()
                     }
                     .padding()
-                    .background(Color(.systemGray6))
-                    
-                    // Bar List Content
+                    .background(Color(.systemGray6).opacity(0.9))
+                }
+                
+                // Bar List Content - FIXED: Proper scrolling list
+                ZStack {
                     if viewModel.isLoading {
                         VStack(spacing: 12) {
                             ProgressView()
                             Text("Loading bars...")
                                 .foregroundColor(.secondary)
                         }
-                        .frame(maxHeight: .infinity, alignment: .center)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     } else if viewModel.filteredBars.isEmpty {
                         VStack(spacing: 12) {
                             Image(systemName: "magnifyingglass")
@@ -62,58 +93,51 @@ struct BarListView: View {
                             Text("No bars found")
                                 .foregroundColor(.secondary)
                         }
-                        .frame(maxHeight: .infinity, alignment: .center)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     } else {
-                        List(viewModel.filteredBars) { bar in
-                            NavigationLink(destination: BarDetailView(bar: bar)) {
-                                BarRowView(bar: bar)
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                ForEach(viewModel.filteredBars) { bar in
+                                    NavigationLink(destination: BarDetailView(bar: bar)) {
+                                        BarRowView(bar: bar)
+                                            .padding(.vertical, 8)
+                                            .padding(.horizontal)
+                                    }
+                                }
                             }
+                            .padding(.vertical, 8)
                         }
-                        .listStyle(.plain)
+                        .background(Color.clear)
                     }
                 }
             }
-            .navigationTitle("Golden Gai Bars")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Picker("Sort", selection: $viewModel.selectedSortOption) {
-                            ForEach(SortOption.allCases, id: \.self) { option in
-                                Text(option.rawValue).tag(option)
-                            }
-                        }
-                        
-                        Divider()
-                        
-                        Toggle("Visited Only", isOn: $viewModel.showVisitedOnly)
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease")
-                    }
-                }
+        }
+        .onAppear {
+            print("📋 BarListView appeared")
+            if !didLoad {
+                didLoad = true
+                print("🔄 Loading bars from repository...")
+                viewModel.loadBars()
+                print("📊 Total bars loaded: \(viewModel.bars.count)")
+                print("📍 Filtered bars: \(viewModel.filteredBars.count)")
+            } else {
+                print("✅ Bars already loaded, count: \(viewModel.bars.count)")
             }
-            .onAppear {
-                print("📋 BarListView appeared")
-                if !didLoad {
-                    didLoad = true
-                    print("🔄 Loading bars from repository...")
-                    viewModel.loadBars()
-                } else {
-                    print("✅ Bars already loaded, count: \(viewModel.bars.count)")
-                }
-            }
-            .onChange(of: viewModel.selectedSortOption) { _ in
-                print("🔀 Sort option changed to: \(viewModel.selectedSortOption.rawValue)")
-                viewModel.updateFilteredBars()
-            }
-            .onChange(of: viewModel.showVisitedOnly) { newValue in
-                print("🔍 Visited filter toggled: \(newValue)")
-                viewModel.updateFilteredBars()
-            }
-            .onChange(of: viewModel.searchText) { newValue in
-                print("🔎 Search text changed: \(newValue)")
-                viewModel.updateFilteredBars()
-            }
+        }
+        .onChange(of: viewModel.selectedSortOption) { _ in
+            print("🔀 Sort option changed to: \(viewModel.selectedSortOption.rawValue)")
+            print("   Filtered count: \(viewModel.filteredBars.count)")
+            viewModel.updateFilteredBars()
+        }
+        .onChange(of: viewModel.showVisitedOnly) { newValue in
+            print("🔍 Visited filter toggled: \(newValue)")
+            print("   Filtered count: \(viewModel.filteredBars.count)")
+            viewModel.updateFilteredBars()
+        }
+        .onChange(of: viewModel.searchText) { newValue in
+            print("🔎 Search text changed: '\(newValue)'")
+            print("   Filtered count: \(viewModel.filteredBars.count)")
+            viewModel.updateFilteredBars()
         }
     }
 }
